@@ -8,7 +8,7 @@ Quick start
 
 ```bash
 cd c:/Users/BITTU/Desktop/Gigfreelancer
-yarn install
+npm  install
 ```
 
 2. Create env file for server: copy `server/.env.example` to `server/.env` and update values.
@@ -16,9 +16,11 @@ yarn install
 3. Start server and client:
 
 ```bash
-yarn workspace server dev
+cd server
+npm run dev
 # in another terminal
-yarn workspace client dev
+cd client
+npm run dev
 ```
 
 Notes
