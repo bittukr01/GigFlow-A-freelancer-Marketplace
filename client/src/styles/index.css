@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  @apply bg-gradient-to-br from-[#0f172a] via-[#0b1220] to-[#0b1020] text-slate-100 font-sans;
+}
+
+.glass {
+  background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+  backdrop-filter: blur(6px);
+}
+
+.card-3d:hover {
+  transform: translateY(-6px) scale(1.01);
+}
+
+@keyframes slideFade {
+  from { transform: translateY(8px); opacity: 0 }
+  to { transform: translateY(0); opacity: 1 }
+}
+
+.animate-slide-fade { animation: slideFade .36s ease both }
+
+.toast-enter { transform: translateY(12px); opacity: 0 }
+.toast-enter-active { transform: translateY(0); opacity: 1; transition: all .28s ease }
+
