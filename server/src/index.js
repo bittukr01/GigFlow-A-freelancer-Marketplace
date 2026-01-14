@@ -16,7 +16,7 @@ app.use(cookieParser());
 // ✅ ALLOWED ORIGINS (LOCAL + DEPLOY)
 const allowedOrigins = [
   'http://localhost:5173',
-  'https://gig-flow-a-freelancer-marketplace-c.vercel.app'
+  'https://gigflow-frontend-8kyr.onrender.com/'
 ];
 
 app.use(
