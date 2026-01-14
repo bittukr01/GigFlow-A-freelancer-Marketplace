@@ -1,12 +1,129 @@
+// const bcrypt = require('bcryptjs');
+// const jwt = require('jsonwebtoken');
+// const User = require('../models/User');
+
+// // ✅ one place cookie config (important)
+// const COOKIE_OPTIONS = {
+//   httpOnly: true,
+//   secure: true,          // 🔥 Render = HTTPS
+//   sameSite: 'lax',       // 🔥 Render + Render best
+//   maxAge: 7 * 24 * 60 * 60 * 1000
+// };
+
+// exports.register = async (req, res) => {
+//   try {
+//     const { name, email, password } = req.body;
+
+//     if (!name || !email || !password) {
+//       return res.status(400).json({ message: 'All fields required' });
+//     }
+
+//     const existing = await User.findOne({ email });
+//     if (existing) {
+//       return res.status(400).json({ message: 'Email already in use' });
+//     }
+
+//     const hashed = await bcrypt.hash(password, 10);
+//     const user = await User.create({ name, email, password: hashed });
+
+//     const token = jwt.sign(
+//       { id: user._id },
+//       process.env.JWT_SECRET,
+//       { expiresIn: '7d' }
+//     );
+
+//     // ✅ FIXED COOKIE
+//     res.cookie('token', token, COOKIE_OPTIONS);
+
+//     res.json({
+//       user: {
+//         id: user._id,
+//         name: user.name,
+//         email: user.email,
+//         avatarUrl: user.avatarUrl
+//       }
+//     });
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ message: 'Server error' });
+//   }
+// };
+
+// exports.login = async (req, res) => {
+//   try {
+//     const { email, password } = req.body;
+
+//     const user = await User.findOne({ email });
+//     if (!user) {
+//       return res.status(400).json({ message: 'Invalid credentials' });
+//     }
+
+//     const ok = await bcrypt.compare(password, user.password);
+//     if (!ok) {
+//       return res.status(400).json({ message: 'Invalid credentials' });
+//     }
+
+//     const token = jwt.sign(
+//       { id: user._id },
+//       process.env.JWT_SECRET,
+//       { expiresIn: '7d' }
+//     );
+
+//     // ✅ FIXED COOKIE
+//     res.cookie('token', token, COOKIE_OPTIONS);
+
+//     res.json({
+//       user: {
+//         id: user._id,
+//         name: user.name,
+//         email: user.email,
+//         avatarUrl: user.avatarUrl
+//       }
+//     });
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ message: 'Server error' });
+//   }
+// };
+
+// exports.logout = (req, res) => {
+//   res.clearCookie('token', {
+//     httpOnly: true,
+//     secure: true,
+//     sameSite: 'lax'
+//   });
+//   res.json({ message: 'Logged out' });
+// };
+
+// exports.me = async (req, res) => {
+//   try {
+//     if (!req.user) {
+//       return res.status(401).json({ message: 'Unauthorized' });
+//     }
+
+//     const user = req.user;
+//     res.json({
+//       user: {
+//         id: user._id,
+//         name: user.name,
+//         email: user.email,
+//         avatarUrl: user.avatarUrl
+//       }
+//     });
+//   } catch (err) {
+//     res.status(500).json({ message: 'Server error' });
+//   }
+// };
+
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
-// ✅ one place cookie config (important)
+// ✅ FIXED: Dynamic cookie config for local dev vs production deployment
 const COOKIE_OPTIONS = {
   httpOnly: true,
-  secure: true,          // 🔥 Render = HTTPS
-  sameSite: 'lax',       // 🔥 Render + Render best
+  secure: process.env.NODE_ENV === 'production', // HTTPS only in production
+  sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // 'none' for cross-origin in production
   maxAge: 7 * 24 * 60 * 60 * 1000
 };
 
@@ -32,7 +149,7 @@ exports.register = async (req, res) => {
       { expiresIn: '7d' }
     );
 
-    // ✅ FIXED COOKIE
+    // ✅ FIXED COOKIE with dynamic settings
     res.cookie('token', token, COOKIE_OPTIONS);
 
     res.json({
@@ -69,7 +186,7 @@ exports.login = async (req, res) => {
       { expiresIn: '7d' }
     );
 
-    // ✅ FIXED COOKIE
+    // ✅ FIXED COOKIE with dynamic settings
     res.cookie('token', token, COOKIE_OPTIONS);
 
     res.json({
@@ -89,8 +206,8 @@ exports.login = async (req, res) => {
 exports.logout = (req, res) => {
   res.clearCookie('token', {
     httpOnly: true,
-    secure: true,
-    sameSite: 'lax'
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
   });
   res.json({ message: 'Logged out' });
 };
