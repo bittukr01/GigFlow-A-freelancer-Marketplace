@@ -3,20 +3,28 @@ const User = require('../models/User');
 
 const auth = async (req, res, next) => {
   try {
-    const token = req.cookies?.token;
+    // ✅ token cookie must exist
+    const token = req.cookies && req.cookies.token;
+
     if (!token) {
-      console.warn('Auth middleware: no token cookie present on request', { path: req.path, method: req.method, cookies: req.cookies });
-      return res.status(401).json({ message: 'Unauthorized' });
+      return res.status(401).json({ message: 'Unauthorized: No token' });
     }
+
+    // ✅ verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log('Auth middleware: decoded token id =', decoded.id);
+
+    // ✅ find user
     const user = await User.findById(decoded.id).select('-password');
-    if (!user) return res.status(401).json({ message: 'Unauthorized' });
+    if (!user) {
+      return res.status(401).json({ message: 'Unauthorized: User not found' });
+    }
+
+    // ✅ attach user to request
     req.user = user;
     next();
   } catch (err) {
-    console.error('Auth middleware error', err);
-    return res.status(401).json({ message: 'Unauthorized' });
+    console.error('Auth error:', err.message);
+    return res.status(401).json({ message: 'Unauthorized: Invalid token' });
   }
 };
 
