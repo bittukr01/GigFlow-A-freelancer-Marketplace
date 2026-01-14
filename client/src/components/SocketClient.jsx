@@ -12,23 +12,34 @@ export default function SocketClient(){
 
   useEffect(()=>{
     if(!user) return;
-    const s = io('http://localhost:4000', { query: { userId: user.id }, transports: ['websocket'] });
+
+    const s = io(import.meta.env.VITE_API_URL, {
+      query: { userId: user.id },
+      withCredentials: true,
+      transports: ['websocket'],
+    });
+
     setSocket(s);
+
     s.on('hired', (payload)=>{
-      setNotifications(n=>[{id:Date.now(), text:`You have been hired for ${payload.project}`, payload}, ...n]);
-      // refresh gigs and current gig if open
+      setNotifications(n=>[
+        {id:Date.now(), text:`You have been hired for ${payload.project}`, payload},
+        ...n
+      ]);
       dispatch(fetchGigs());
       if (payload.gigId) dispatch(fetchGigById(payload.gigId));
-      // refresh my bid/hired counts so Dashboard updates for bidder
       dispatch(fetchMyCounts());
     });
 
     s.on('new_bid', (payload)=>{
-      // notify owner and refresh gigs
-      setNotifications(n=>[{id:Date.now(), text:`New bid on ${payload.gigId}`, payload}, ...n]);
+      setNotifications(n=>[
+        {id:Date.now(), text:`New bid on ${payload.gigId}`, payload},
+        ...n
+      ]);
       dispatch(fetchGigs());
       if (payload.gigId) dispatch(fetchGigById(payload.gigId));
     });
+
     return ()=> s.disconnect();
   }, [user]);
 
